@@ -1,0 +1,46 @@
+{
+    "name": "Fjf/crudgenerator",
+    "license": "MIT",
+    "type": "library",
+    "description": "Simple Crud Generator",
+    "keywords": [
+        "laravel",
+        "crud",
+        "laravel crud admin",
+        "laravel crud admin panel"
+    ],
+    "authors": [
+        {
+            "name": "Muhammad Al Jawad",
+            "email": "buruhsd@outlook.co.id",
+            "name": "Fahmi Hidayat",
+            "email": "fahmisodret@gmail.com",
+            "name": "friska sulistya",
+            "email": "friskasusanto8@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "php": ">=5.5.9",
+        "illuminate/support": "^5.1",
+        "appzcoder/crud-generator": "^3.0",
+        "laravelcollective/html": "~5.1"
+    },
+    "autoload": {
+        "psr-4": {
+           "Fjf\\Crudgenerator\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Fjf\\Crudgenerator\\": "tests"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Fjf\\Crudgenerator\\CrudGeneratorServiceProvider"
+            ]
+        }
+    }
+}
