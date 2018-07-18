@@ -20,7 +20,7 @@ class LaravelAdminCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Install the Laravel Admin.';
+    protected $description = 'Installing Laravel Admin Crud.';
 
     /**
      * Create a new command instance.

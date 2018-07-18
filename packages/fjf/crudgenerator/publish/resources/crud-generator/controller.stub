@@ -11,6 +11,13 @@ use Illuminate\Http\Request;
 class DummyClass extends Controller
 {
     /**
+    * constructor
+    */
+    public function __construct(){
+        $this->perPage = {{pagination}};
+        $this->mainTable = '{{modelName}}s';
+    }
+    /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\View\View
@@ -18,15 +25,15 @@ class DummyClass extends Controller
     public function index(Request $request)
     {
         $keyword = $request->get('search');
-        $perPage = {{pagination}};
 
         if (!empty($keyword)) {
-            ${{crudName}} = {{modelName}}::{{whereSnippet}}paginate($perPage);
+            ${{crudName}} = {{modelName}}::{{whereSnippet}}paginate($this->perPage);
         } else {
             ${{crudName}} = {{modelName}}::paginate($perPage);
         }
+        $footer_script = $this->footer_script(__FUNCTION__);
 
-        return view('{{viewPath}}{{viewName}}.index', compact('{{crudName}}'));
+        return view('{{viewPath}}{{viewName}}.index', compact('{{crudName}}', 'footer_script'));
     }
 
     /**
@@ -36,7 +43,8 @@ class DummyClass extends Controller
      */
     public function create()
     {
-        return view('{{viewPath}}{{viewName}}.create');
+        $footer_script = $this->footer_script(__FUNCTION__);
+        return view('{{viewPath}}{{viewName}}.create', compact('footer_script'));
     }
 
     /**
@@ -67,7 +75,8 @@ class DummyClass extends Controller
     {
         ${{crudNameSingular}} = {{modelName}}::findOrFail($id);
 
-        return view('{{viewPath}}{{viewName}}.show', compact('{{crudNameSingular}}'));
+        $footer_script = $this->footer_script(__FUNCTION__);
+        return view('{{viewPath}}{{viewName}}.show', compact('{{crudNameSingular}}', 'footer_script'));
     }
 
     /**
@@ -81,7 +90,8 @@ class DummyClass extends Controller
     {
         ${{crudNameSingular}} = {{modelName}}::findOrFail($id);
 
-        return view('{{viewPath}}{{viewName}}.edit', compact('{{crudNameSingular}}'));
+        $footer_script = $this->footer_script(__FUNCTION__);
+        return view('{{viewPath}}{{viewName}}.edit', compact('{{crudNameSingular}}', 'footer_script'));
     }
 
     /**
@@ -115,5 +125,58 @@ class DummyClass extends Controller
         {{modelName}}::destroy($id);
 
         return redirect('{{routeGroup}}{{viewName}}')->with('flash_message', '{{modelName}} deleted!');
+    }
+
+    /**
+    * @param $where
+    * @return
+    */
+    public function get_one_row($where='1', $join=array()){
+        $qry = 'SELECT * FROM '.$this->mainTable;
+        if(!empty($join)){
+            foreach ($join as $value) {
+                $qry .= $value;
+            }
+        }
+        $qry .= ' WHERE '.$where.' Limit 1';
+        ${{crudNameSingular}} = DB::query($qry);
+
+        return ${{crudNameSingular}};
+    }
+
+    /**
+    * @param method $method
+    * @return add main footer script / in spesific method
+    */
+    public function footer_script($method=''){
+        ob_start();
+        ?>
+            <script type="text/javascript"></script>
+        <?php
+        switch ($method) {
+            case 'index':
+                ?>
+                    <script type="text/javascript"></script>
+                <?php
+                break;
+            case 'create':
+                ?>
+                    <script type="text/javascript"></script>
+                <?php
+                break;
+            case 'show':
+                ?>
+                    <script type="text/javascript"></script>
+                <?php
+                break;
+            case 'edit':
+                ?>
+                    <script type="text/javascript"></script>
+                <?php
+                break;
+        }
+        $script = ob_get_contents();
+        ob_end_clean();
+        return $script;
     }
 }
