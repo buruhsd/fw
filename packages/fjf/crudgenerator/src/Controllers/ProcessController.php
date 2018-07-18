@@ -23,6 +23,33 @@ class ProcessController extends Controller
         return view('laravel-admin::generator');
     }
 
+    public function run(Request $request){
+        $choose = '';
+        if ($request->has('choose')) {
+            $choose = $request->choose;
+        }
+        switch ($choose) {
+            case 'all':
+                return $this->postGenerator($request);
+                break;
+            case 'controller':
+                return $this->postController($request);
+                break;
+            case 'model':
+                return $this->postModel($request);
+                break;
+            case 'migration':
+                return $this->postMigration($request);
+                break;
+            case 'view':
+                return $this->postView($request);
+                break;
+            default:
+                return $this->postGenerator($request);
+                break;
+        }
+    }
+
     /**
      * Process generator.
      *
