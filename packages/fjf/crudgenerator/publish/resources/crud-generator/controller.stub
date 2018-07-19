@@ -7,6 +7,11 @@ use DummyRootNamespaceHttp\Controllers\Controller;
 
 use DummyRootNamespace{{modelNamespace}}{{modelName}};
 use Illuminate\Http\Request;
+use Session;
+use Illuminate\Support\Facades\File;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\DB;
+
 
 class DummyClass extends Controller
 {
@@ -27,13 +32,13 @@ class DummyClass extends Controller
         $keyword = $request->get('search');
 
         if (!empty($keyword)) {
-            ${{crudName}} = {{modelName}}::{{whereSnippet}}paginate($this->perPage);
+            $data['{{crudName}}'] = {{modelName}}::{{whereSnippet}}paginate($this->perPage);
         } else {
-            ${{crudName}} = {{modelName}}::paginate($perPage);
+            $data['{{crudName}}'] = {{modelName}}::paginate($perPage);
         }
-        $footer_script = $this->footer_script(__FUNCTION__);
+        $data['footer_script'] = $this->footer_script(__FUNCTION__);
 
-        return view('{{viewPath}}{{viewName}}.index', compact('{{crudName}}', 'footer_script'));
+        return view('{{viewPath}}{{viewName}}.index', $data);
     }
 
     /**
@@ -43,8 +48,8 @@ class DummyClass extends Controller
      */
     public function create()
     {
-        $footer_script = $this->footer_script(__FUNCTION__);
-        return view('{{viewPath}}{{viewName}}.create', compact('footer_script'));
+        $data['footer_script'] = $this->footer_script(__FUNCTION__);
+        return view('{{viewPath}}{{viewName}}.create', $data);
     }
 
     /**
@@ -61,7 +66,8 @@ class DummyClass extends Controller
         {{fileSnippet}}
         {{modelName}}::create($requestData);
 
-        return redirect('{{routeGroup}}{{viewName}}')->with('flash_message', '{{modelName}} added!');
+        return redirect('{{routeGroup}}{{viewName}}')
+            ->with(['flash_status' => 200,'flash_message' => '{{modelName}} added!']);
     }
 
     /**
@@ -73,10 +79,10 @@ class DummyClass extends Controller
      */
     public function show($id)
     {
-        ${{crudNameSingular}} = {{modelName}}::findOrFail($id);
+        $data['{{crudNameSingular}}'] = {{modelName}}::findOrFail($id);
 
-        $footer_script = $this->footer_script(__FUNCTION__);
-        return view('{{viewPath}}{{viewName}}.show', compact('{{crudNameSingular}}', 'footer_script'));
+        $data['footer_script'] = $this->footer_script(__FUNCTION__);
+        return view('{{viewPath}}{{viewName}}.show', $data);
     }
 
     /**
@@ -88,10 +94,10 @@ class DummyClass extends Controller
      */
     public function edit($id)
     {
-        ${{crudNameSingular}} = {{modelName}}::findOrFail($id);
+        $data['{{crudNameSingular}}'] = {{modelName}}::findOrFail($id);
 
-        $footer_script = $this->footer_script(__FUNCTION__);
-        return view('{{viewPath}}{{viewName}}.edit', compact('{{crudNameSingular}}', 'footer_script'));
+        $data['footer_script'] = $this->footer_script(__FUNCTION__);
+        return view('{{viewPath}}{{viewName}}.edit', $data);
     }
 
     /**
@@ -110,7 +116,8 @@ class DummyClass extends Controller
         ${{crudNameSingular}} = {{modelName}}::findOrFail($id);
         ${{crudNameSingular}}->update($requestData);
 
-        return redirect('{{routeGroup}}{{viewName}}')->with('flash_message', '{{modelName}} updated!');
+        return redirect('{{routeGroup}}{{viewName}}')
+            ->with(['flash_status' => 200,'flash_message' => '{{modelName}} updated!']);
     }
 
     /**
@@ -124,7 +131,8 @@ class DummyClass extends Controller
     {
         {{modelName}}::destroy($id);
 
-        return redirect('{{routeGroup}}{{viewName}}')->with('flash_message', '{{modelName}} deleted!');
+        return redirect('{{routeGroup}}{{viewName}}')
+            ->with(['flash_status' => 200,'flash_message' => '{{modelName}} deleted!']);
     }
 
     /**

@@ -64,7 +64,7 @@
         <main class="py-4">
             @if (Session::has('flash_message'))
                 <div class="container">
-                    <div class="alert alert-success">
+                    <div class="alert alert-{{(Session::has('flash_status') == 200)?success:danger}}">
                         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
                         {{ Session::get('flash_message') }}
                     </div>

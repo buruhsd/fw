@@ -39,7 +39,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Fjf\\Crudgenerator\\CrudGeneratorServiceProvider"
+                "Fjf\\Crudgenerator\\LaravelAdminServiceProvider"
             ]
         }
     }

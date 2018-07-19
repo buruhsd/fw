@@ -23,6 +23,10 @@ class ProcessController extends Controller
         return view('laravel-admin::generator');
     }
 
+    /**
+    * @param $request form #choose
+    * @return
+    */
     public function run(Request $request){
         $choose = '';
         if ($request->has('choose')) {

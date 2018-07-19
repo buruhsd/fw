@@ -23,4 +23,44 @@ class DummyClass extends Model
     protected $fillable = {{fillable}};
 
     {{relationships}}
+
+    /**
+    * this is for get parent example
+    * @relation one to many with parent
+    */
+    // public function tables() {
+    //     return $this->belongsTo('App\modelname', 'table_id');
+    // }
+
+    /**
+    * this is for get child example
+    * @relation one many with children
+    */
+    // public function tables() {
+    //     return $this->hasMany('App\modelname')->orderBy('{{primaryKey}}', 'ASC');
+    // }
+
+    /**
+    * this is for get child example
+    * @relation with children
+    */
+    // public function tables() {
+    //     return $this->hasOne('App\modelname')->orderBy('{{primaryKey}}', 'ASC');
+    // }
+
+    /**
+    * this is for get child example
+    * @relation many to many with children
+    */
+    // public function tables() {
+    //     return $this->belongsToMany('App\modelname')->orderBy('{{primaryKey}}', 'ASC');
+    // }
+
+    /**
+    * this is for get child example
+    * @relation has many children and have many children
+    */
+    // public function tables() {
+    //     return $this->hasManyThrough('App\modelname', 'App\modelname');
+    // }
 }

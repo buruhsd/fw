@@ -75,10 +75,19 @@ Route::resource('admin/roles', 'Admin\\RolesController');
 Route::resource('admin/permissions', 'Admin\\PermissionsController');
 Route::resource('admin/users', 'Admin\\UsersController');
 Route::get('admin/generator', ['uses' => '\Fjf\Crudgenerator\Controllers\ProcessController@getGenerator']);
-Route::post('admin/generator', ['uses' => '\Fjf\Crudgenerator\Controllers\ProcessController@postGenerator']);
+Route::post('admin/generator', ['uses' => '\Fjf\Crudgenerator\Controllers\ProcessController@run']);
 EOD;
 
         File::append($routeFile, "\n" . $routes);
+
+        $userFile = app_path('Http/User.php');
+        if (\App::VERSION() >= '5.3') {
+            $routeFile = base_path('routes/web.php');
+        }
+        $repUser = 'use Notifiable, HasRoles';
+        
+        $this->info("Updating Model User usable");
+        $this->replaseUser($userFile, $name);
 
         $this->info("Overriding the AuthServiceProvider");
         $contents = File::get(__DIR__ . '/../publish/Providers/AuthServiceProvider.php');
@@ -86,4 +95,20 @@ EOD;
 
         $this->info("Successfully installed Laravel Admin!");
     }
+
+    /**
+     * Replace the crudName for the given stub.
+     *
+     * @param  string  $stub
+     * @param  string  $crudName
+     *
+     * @return $this
+     */
+    protected function replaseUser(&$stub, $crudName)
+    {
+        $stub = str_replace('use Notifiable', $crudName, $stub);
+
+        return $this;
+    }
+
 }
