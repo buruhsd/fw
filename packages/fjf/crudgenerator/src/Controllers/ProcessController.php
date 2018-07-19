@@ -59,7 +59,7 @@ class ProcessController extends Controller
      *
      * @return Response
      */
-    public function postGenerator(Request $request)
+    public function postGenerator($request)
     {
         $commandArg = [];
         $commandArg['name'] = $request->crud_name;
@@ -151,7 +151,7 @@ class ProcessController extends Controller
     * @param
     * @return
     */
-    public function postController(Request $request){
+    public function postController($request){
         $name = $request->crud_name;
         $modelName = str_singular($name);
 
@@ -205,7 +205,7 @@ class ProcessController extends Controller
     * @param
     * @return
     */
-    public function postModel(Request $request){
+    public function postModel($request){
         $name = $request->crud_name;
         $modelName = str_singular($name);
         $tableName = str_plural(snake_case($name));
@@ -265,7 +265,7 @@ class ProcessController extends Controller
     * @param
     * @return
     */
-    public function postMigration(Request $request){
+    public function postMigration($request){
         $name = $request->crud_name;
         $migrationName = str_plural(snake_case($name));
 
@@ -311,7 +311,7 @@ class ProcessController extends Controller
     * @param
     * @return
     */
-    public function postView(Request $request){
+    public function postView($request){
         $name = $request->crud_name;
 
         if ($request->has('fields')) {
