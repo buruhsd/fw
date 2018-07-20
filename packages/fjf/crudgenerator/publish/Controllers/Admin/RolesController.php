@@ -9,6 +9,10 @@ use Illuminate\Http\Request;
 
 class RolesController extends Controller
 {
+    
+    private $perPage = 15;
+    private $mainTable = 'roles';
+
     /**
      * Display a listing of the resource.
      *
@@ -17,16 +21,16 @@ class RolesController extends Controller
     public function index(Request $request)
     {
         $keyword = $request->get('search');
-        $perPage = 15;
 
         if (!empty($keyword)) {
-            $roles = Role::where('name', 'LIKE', "%$keyword%")->orWhere('label', 'LIKE', "%$keyword%")
-                ->paginate($perPage);
+            $data['roles'] = Role::where('name', 'LIKE', "%$keyword%")->orWhere('label', 'LIKE', "%$keyword%")
+                ->paginate($this->perPage);
         } else {
-            $roles = Role::paginate($perPage);
+            $data['roles'] = Role::paginate($this->perPage);
         }
+        $data['footer_script'] = $this->footer_script(__FUNCTION__);
 
-        return view('admin.roles.index', compact('roles'));
+        return view('admin.roles.index', $data);
     }
 
     /**
@@ -36,9 +40,10 @@ class RolesController extends Controller
      */
     public function create()
     {
-        $permissions = Permission::select('id', 'name', 'label')->get()->pluck('label', 'name');
+        $data['permissions'] = Permission::select('id', 'name', 'label')->get()->pluck('label', 'name');
+        $data['footer_script'] = $this->footer_script(__FUNCTION__);
 
-        return view('admin.roles.create', compact('permissions'));
+        return view('admin.roles.create', $data);
     }
 
     /**
@@ -50,6 +55,8 @@ class RolesController extends Controller
      */
     public function store(Request $request)
     {
+        $status = 200;
+        $message = 'Role added!';
         $this->validate($request, ['name' => 'required']);
 
         $role = Role::create($request->all());
@@ -62,7 +69,8 @@ class RolesController extends Controller
             }
         }
 
-        return redirect('admin/roles')->with('flash_message', 'Role added!');
+        return redirect('admin/roles')
+            ->with(['flash_status' => $status,'flash_message' => $message]);
     }
 
     /**
@@ -74,9 +82,10 @@ class RolesController extends Controller
      */
     public function show($id)
     {
-        $role = Role::findOrFail($id);
+        $data['role'] = Role::findOrFail($id);
+        $data['footer_script'] = $this->footer_script(__FUNCTION__);
 
-        return view('admin.roles.show', compact('role'));
+        return view('admin.roles.show', $data);
     }
 
     /**
@@ -88,10 +97,11 @@ class RolesController extends Controller
      */
     public function edit($id)
     {
-        $role = Role::findOrFail($id);
-        $permissions = Permission::select('id', 'name', 'label')->get()->pluck('label', 'name');
+        $data['role'] = Role::findOrFail($id);
+        $data['permissions'] = Permission::select('id', 'name', 'label')->get()->pluck('label', 'name');
+        $data['footer_script'] = $this->footer_script(__FUNCTION__);
 
-        return view('admin.roles.edit', compact('role', 'permissions'));
+        return view('admin.roles.edit', $data);
     }
 
     /**
@@ -104,6 +114,8 @@ class RolesController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $status = 200;
+        $message = 'Role updated!';
         $this->validate($request, ['name' => 'required']);
 
         $role = Role::findOrFail($id);
@@ -117,7 +129,8 @@ class RolesController extends Controller
             }
         }
 
-        return redirect('admin/roles')->with('flash_message', 'Role updated!');
+        return redirect('admin/roles')
+            ->with(['flash_status' => $status,'flash_message' => $message]);
     }
 
     /**
@@ -129,8 +142,15 @@ class RolesController extends Controller
      */
     public function destroy($id)
     {
-        Role::destroy($id);
+        $status = 200;
+        $message = 'Role deleted!';
+        $res = Role::destroy($id);
+        if(!$res){
+            $status = 500;
+            $message = 'Role Not deleted!';
+        }
 
-        return redirect('admin/roles')->with('flash_message', 'Role deleted!');
+        return redirect('admin/roles')
+            ->with(['flash_status' => $status,'flash_message' => $message]);
     }
 }

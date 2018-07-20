@@ -19,7 +19,7 @@
         "fideloper/proxy": "^4.0",
         "laravel/framework": "5.6.*",
         "laravel/tinker": "^1.0",
-        "fjf/crudgenerator": "dev-master"
+        "fjf/crudgenerator": "dev-fahmicool"
     },
     "require-dev": {
         "filp/whoops": "^2.0",
@@ -34,7 +34,8 @@
             "database/factories"
         ],
         "psr-4": {
-            "App\\": "app/"
+            "App\\": "app/",
+            "Fjf\\crudgenerator\\": "packages/fjf/crudgenerator/src"
         }
     },
     "autoload-dev": {

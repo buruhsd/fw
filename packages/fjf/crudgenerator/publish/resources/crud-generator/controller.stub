@@ -15,13 +15,8 @@ use Illuminate\Support\Facades\DB;
 
 class DummyClass extends Controller
 {
-    /**
-    * constructor
-    */
-    public function __construct(){
-        $this->perPage = {{pagination}};
-        $this->mainTable = '{{modelName}}s';
-    }
+    private $perPage = {{pagination}};
+    private $mainTable = '{{modelName}}s';
     /**
      * Display a listing of the resource.
      *
@@ -34,7 +29,7 @@ class DummyClass extends Controller
         if (!empty($keyword)) {
             $data['{{crudName}}'] = {{modelName}}::{{whereSnippet}}paginate($this->perPage);
         } else {
-            $data['{{crudName}}'] = {{modelName}}::paginate($perPage);
+            $data['{{crudName}}'] = {{modelName}}::paginate($this->perPage);
         }
         $data['footer_script'] = $this->footer_script(__FUNCTION__);
 
@@ -61,13 +56,18 @@ class DummyClass extends Controller
      */
     public function store(Request $request)
     {
+        $status = 200;
+        $message = '{{modelName}} added!';
         {{validationRules}}
         $requestData = $request->all();
         {{fileSnippet}}
-        {{modelName}}::create($requestData);
-
+        $res = {{modelName}}::create($requestData);
+        if(!$res){
+            $status = 500;
+            $message = '{{modelName}} Not added!';
+        }
         return redirect('{{routeGroup}}{{viewName}}')
-            ->with(['flash_status' => 200,'flash_message' => '{{modelName}} added!']);
+            ->with(['flash_status' => $status,'flash_message' => $message]);
     }
 
     /**
@@ -110,14 +110,20 @@ class DummyClass extends Controller
      */
     public function update(Request $request, $id)
     {
+        $status = 200;
+        $message = '{{modelName}} added!';
         {{validationRules}}
         $requestData = $request->all();
         {{fileSnippet}}
         ${{crudNameSingular}} = {{modelName}}::findOrFail($id);
-        ${{crudNameSingular}}->update($requestData);
+        $res = ${{crudNameSingular}}->update($requestData);
+        if(!$res){
+            $status = 500;
+            $message = '{{modelName}} Not updated!';
+        }
 
         return redirect('{{routeGroup}}{{viewName}}')
-            ->with(['flash_status' => 200,'flash_message' => '{{modelName}} updated!']);
+            ->with(['flash_status' => $status,'flash_message' => $message]);
     }
 
     /**
@@ -129,10 +135,16 @@ class DummyClass extends Controller
      */
     public function destroy($id)
     {
-        {{modelName}}::destroy($id);
+        $status = 200;
+        $message = '{{modelName}} added!';
+        $res = {{modelName}}::destroy($id);
+        if(!$res){
+            $status = 500;
+            $message = '{{modelName}} Not deleted!';
+        }
 
         return redirect('{{routeGroup}}{{viewName}}')
-            ->with(['flash_status' => 200,'flash_message' => '{{modelName}} deleted!']);
+            ->with(['flash_status' => $status,'flash_message' => $message]);
     }
 
     /**

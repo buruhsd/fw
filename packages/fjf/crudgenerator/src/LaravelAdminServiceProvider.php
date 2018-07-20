@@ -54,7 +54,7 @@ class LaravelAdminServiceProvider extends ServiceProvider
         $menus = [];
         if (File::exists(base_path('resources/laravel-admin/menus.json'))) {
             $menus = json_decode(File::get(base_path('resources/laravel-admin/menus.json')));
-            view()->share('laravelAdminMenus', $menus);
+            view()->share('fjfMenus', $menus);
         }
     }
 

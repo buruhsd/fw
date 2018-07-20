@@ -37,7 +37,7 @@ class DummyClass extends Model
     * @relation one many with children
     */
     // public function tables() {
-    //     return $this->hasMany('App\modelname')->orderBy('{{primaryKey}}', 'ASC');
+    //     return $this->hasMany('App\modelname')->orderBy('id', 'ASC');
     // }
 
     /**
@@ -45,7 +45,7 @@ class DummyClass extends Model
     * @relation with children
     */
     // public function tables() {
-    //     return $this->hasOne('App\modelname')->orderBy('{{primaryKey}}', 'ASC');
+    //     return $this->hasOne('App\modelname')->orderBy('id', 'ASC');
     // }
 
     /**
@@ -53,7 +53,7 @@ class DummyClass extends Model
     * @relation many to many with children
     */
     // public function tables() {
-    //     return $this->belongsToMany('App\modelname')->orderBy('{{primaryKey}}', 'ASC');
+    //     return $this->belongsToMany('App\modelname')->orderBy('id', 'ASC');
     // }
 
     /**

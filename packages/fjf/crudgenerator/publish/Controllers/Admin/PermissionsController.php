@@ -8,6 +8,10 @@ use Illuminate\Http\Request;
 
 class PermissionsController extends Controller
 {
+
+    private $perPage = 15;
+    private $mainTable = 'permissions';
+
     /**
      * Display a listing of the resource.
      *
@@ -16,16 +20,16 @@ class PermissionsController extends Controller
     public function index(Request $request)
     {
         $keyword = $request->get('search');
-        $perPage = 15;
 
         if (!empty($keyword)) {
-            $permissions = Permission::where('name', 'LIKE', "%$keyword%")->orWhere('label', 'LIKE', "%$keyword%")
-                ->paginate($perPage);
+            $data['permissions'] = Permission::where('name', 'LIKE', "%$keyword%")->orWhere('label', 'LIKE', "%$keyword%")
+                ->paginate($this->perPage);
         } else {
-            $permissions = Permission::paginate($perPage);
+            $data['permissions'] = Permission::paginate($this->perPage);
         }
+        $data['footer_script'] = $this->footer_script(__FUNCTION__);
 
-        return view('admin.permissions.index', compact('permissions'));
+        return view('admin.permissions.index', $data);
     }
 
     /**
@@ -35,7 +39,8 @@ class PermissionsController extends Controller
      */
     public function create()
     {
-        return view('admin.permissions.create');
+        $data['footer_script'] = $this->footer_script(__FUNCTION__);
+        return view('admin.permissions.create', $data);
     }
 
     /**
@@ -47,11 +52,18 @@ class PermissionsController extends Controller
      */
     public function store(Request $request)
     {
+        $status = 200;
+        $message = 'Permission added!';
         $this->validate($request, ['name' => 'required']);
 
-        Permission::create($request->all());
+        $res = Permission::create($request->all());
+        if(!$res){
+            $status = 500;
+            $message = 'Permission Not added!';
+        }
 
-        return redirect('admin/permissions')->with('flash_message', 'Permission added!');
+        return redirect('admin/permissions')
+            ->with(['flash_status' => $status,'flash_message' => $message]);
     }
 
     /**
@@ -63,9 +75,10 @@ class PermissionsController extends Controller
      */
     public function show($id)
     {
-        $permission = Permission::findOrFail($id);
+        $data['permission'] = Permission::findOrFail($id);
+        $data['footer_script'] = $this->footer_script(__FUNCTION__);
 
-        return view('admin.permissions.show', compact('permission'));
+        return view('admin.permissions.show', $data);
     }
 
     /**
@@ -77,9 +90,10 @@ class PermissionsController extends Controller
      */
     public function edit($id)
     {
-        $permission = Permission::findOrFail($id);
+        $data['permission'] = Permission::findOrFail($id);
+        $data['footer_script'] = $this->footer_script(__FUNCTION__);
 
-        return view('admin.permissions.edit', compact('permission'));
+        return view('admin.permissions.edit', $data);
     }
 
     /**
@@ -92,12 +106,19 @@ class PermissionsController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $status = 200;
+        $message = 'Permission updated!';
         $this->validate($request, ['name' => 'required']);
 
         $permission = Permission::findOrFail($id);
-        $permission->update($request->all());
+        $res = $permission->update($request->all());
+        if(!$res){
+            $status = 500;
+            $message = 'Permission Not updated!';
+        }
 
-        return redirect('admin/permissions')->with('flash_message', 'Permission updated!');
+        return redirect('admin/permissions')
+            ->with(['flash_status' => $status,'flash_message' => $message]);
     }
 
     /**
@@ -109,8 +130,15 @@ class PermissionsController extends Controller
      */
     public function destroy($id)
     {
-        Permission::destroy($id);
+        $status = 200;
+        $message = 'Permission deleted!';
+        $res = Permission::destroy($id);
+        if(!$res){
+            $status = 500;
+            $message = 'Permission Not deleted!';
+        }
 
-        return redirect('admin/permissions')->with('flash_message', 'Permission deleted!');
+        return redirect('admin/permissions')
+            ->with(['flash_status' => $status,'flash_message' => $message]);
     }
 }

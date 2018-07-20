@@ -9,6 +9,10 @@ use Illuminate\Http\Request;
 
 class UsersController extends Controller
 {
+    
+    private $perPage = 15;
+    private $mainTable = 'users';
+
     /**
      * Display a listing of the resource.
      *
@@ -17,16 +21,16 @@ class UsersController extends Controller
     public function index(Request $request)
     {
         $keyword = $request->get('search');
-        $perPage = 15;
 
         if (!empty($keyword)) {
-            $users = User::where('name', 'LIKE', "%$keyword%")->orWhere('email', 'LIKE', "%$keyword%")
-                ->paginate($perPage);
+            $data['users'] = User::where('name', 'LIKE', "%$keyword%")->orWhere('email', 'LIKE', "%$keyword%")
+                ->paginate($this->perPage);
         } else {
-            $users = User::paginate($perPage);
+            $data['users'] = User::paginate($this->perPage);
         }
+        $data['footer_script'] = $this->footer_script(__FUNCTION__);
 
-        return view('admin.users.index', compact('users'));
+        return view('admin.users.index', $data);
     }
 
     /**
@@ -37,9 +41,10 @@ class UsersController extends Controller
     public function create()
     {
         $roles = Role::select('id', 'name', 'label')->get();
-        $roles = $roles->pluck('label', 'name');
+        $data['roles'] = $roles->pluck('label', 'name');
+        $data['footer_script'] = $this->footer_script(__FUNCTION__);
 
-        return view('admin.users.create', compact('roles'));
+        return view('admin.users.create', $data);
     }
 
     /**
@@ -51,6 +56,8 @@ class UsersController extends Controller
      */
     public function store(Request $request)
     {
+        $status = 200;
+        $message = 'User added!';
         $this->validate($request, ['name' => 'required', 'email' => 'required', 'password' => 'required', 'roles' => 'required']);
 
         $data = $request->except('password');
@@ -61,7 +68,8 @@ class UsersController extends Controller
             $user->assignRole($role);
         }
 
-        return redirect('admin/users')->with('flash_message', 'User added!');
+        return redirect('admin/users')
+            ->with(['flash_status' => $status,'flash_message' => $message]);
     }
 
     /**
@@ -73,9 +81,10 @@ class UsersController extends Controller
      */
     public function show($id)
     {
-        $user = User::findOrFail($id);
+        $data['user'] = User::findOrFail($id);
+        $data['footer_script'] = $this->footer_script(__FUNCTION__);
 
-        return view('admin.users.show', compact('user'));
+        return view('admin.users.show', $data);
     }
 
     /**
@@ -88,15 +97,16 @@ class UsersController extends Controller
     public function edit($id)
     {
         $roles = Role::select('id', 'name', 'label')->get();
-        $roles = $roles->pluck('label', 'name');
+        $data['roles'] = $roles->pluck('label', 'name');
 
-        $user = User::with('roles')->select('id', 'name', 'email')->findOrFail($id);
-        $user_roles = [];
+        $data['user'] = User::with('roles')->select('id', 'name', 'email')->findOrFail($id);
+        $data['user_roles'] = [];
         foreach ($user->roles as $role) {
-            $user_roles[] = $role->name;
+            $data['user_roles'][] = $role->name;
         }
+        $data['footer_script'] = $this->footer_script(__FUNCTION__);
 
-        return view('admin.users.edit', compact('user', 'roles', 'user_roles'));
+        return view('admin.users.edit', $data);
     }
 
     /**
@@ -109,6 +119,8 @@ class UsersController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $status = 200;
+        $message = 'User updated!';
         $this->validate($request, ['name' => 'required', 'email' => 'required', 'roles' => 'required']);
 
         $data = $request->except('password');
@@ -124,7 +136,8 @@ class UsersController extends Controller
             $user->assignRole($role);
         }
 
-        return redirect('admin/users')->with('flash_message', 'User updated!');
+        return redirect('admin/users')
+            ->with(['flash_status' => $status,'flash_message' => $message]);
     }
 
     /**
@@ -136,8 +149,15 @@ class UsersController extends Controller
      */
     public function destroy($id)
     {
-        User::destroy($id);
+        $status = 200;
+        $message = 'User deleted!';
+        $res = User::destroy($id);
+        if(!$res){
+            $status = 500;
+            $message = 'User Not deleted!';
+        }
 
-        return redirect('admin/users')->with('flash_message', 'User deleted!');
+        return redirect('admin/users')
+            ->with(['flash_status' => $status,'flash_message' => $message]);
     }
 }
