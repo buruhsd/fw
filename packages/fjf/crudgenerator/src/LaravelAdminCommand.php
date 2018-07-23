@@ -80,20 +80,17 @@ EOD;
 
         File::append($routeFile, "\n" . $routes);
 
-        $userFile = app_path('Http/User.php');
-        if (\App::VERSION() >= '5.3') {
-            $routeFile = base_path('routes/web.php');
-        }
-        $repUser = 'use Notifiable, HasRoles';
+        $userFile = app_path('User.php');
+        $repUser = 'use Notifiable, HasRoles;';
         
         $this->info("Updating Model User usable");
-        $this->replaseUser($userFile, $name);
+        $this->replaseUser($userFile, $repUser);
 
         $this->info("Overriding the AuthServiceProvider");
         $contents = File::get(__DIR__ . '/../publish/Providers/AuthServiceProvider.php');
         File::put(app_path('Providers/AuthServiceProvider.php'), $contents);
 
-        $this->info("Successfully installed Laravel Admin!");
+        $this->info("Successfully installed Laravel Admin!!!");
     }
 
     /**
@@ -104,11 +101,15 @@ EOD;
      *
      * @return $this
      */
-    protected function replaseUser(&$stub, $crudName)
+    protected function replaseUser(&$stub, $replace)
     {
-        $stub = str_replace('use Notifiable', $crudName, $stub);
+        $fhandle = fopen($stub,"r");
+        $content = fread($fhandle,filesize($stub));
+        $content = str_replace("use Notifiable;", $replace, $content);
 
-        return $this;
+        $fhandle = fopen($stub,"w");
+        fwrite($fhandle,$content);
+        fclose($fhandle);
     }
 
 }

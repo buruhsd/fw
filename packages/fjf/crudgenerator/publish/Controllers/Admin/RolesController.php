@@ -153,4 +153,40 @@ class RolesController extends Controller
         return redirect('admin/roles')
             ->with(['flash_status' => $status,'flash_message' => $message]);
     }
+
+    /**
+    * @param method $method
+    * @return add main footer script / in spesific method
+    */
+    public function footer_script($method=''){
+        ob_start();
+        ?>
+            <script type="text/javascript"></script>
+        <?php
+        switch ($method) {
+            case 'index':
+                ?>
+                    <script type="text/javascript"></script>
+                <?php
+                break;
+            case 'create':
+                ?>
+                    <script type="text/javascript"></script>
+                <?php
+                break;
+            case 'show':
+                ?>
+                    <script type="text/javascript"></script>
+                <?php
+                break;
+            case 'edit':
+                ?>
+                    <script type="text/javascript"></script>
+                <?php
+                break;
+        }
+        $script = ob_get_contents();
+        ob_end_clean();
+        return $script;
+    }
 }
