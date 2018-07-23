@@ -93,6 +93,7 @@
         });
     </script>
 
+    {!! (isset($footer_script))?$footer_script:'' !!}
     @yield('scripts')
 </body>
 </html>

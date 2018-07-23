@@ -14,30 +14,42 @@
                             {{ csrf_field() }}
 
                             <div class="form-group row">
+                                <label for="crud_name" class="col-md-4 col-form-label text-right">Crud Type:</label>
+                                <div class="col-md-6">
+                                    <select name="choose" class="form-control" id="choose">
+                                        <option value="all">All</option>
+                                        <option value="controller">Controller</option>
+                                        <option value="model">Model</option>
+                                        <option value="view">View</option>
+                                        <option value="migration">Migration</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row a c mo mi v">
                                 <label for="crud_name" class="col-md-4 col-form-label text-right">Crud Name:</label>
                                 <div class="col-md-6">
                                     <input type="text" name="crud_name" class="form-control" id="crud_name" placeholder="Posts" required="true">
                                 </div>
                             </div>
-                            <div class="form-group row">
+                            <div class="form-group row a c">
                                 <label for="controller_namespace" class="col-md-4 col-form-label text-right">Controller Namespace:</label>
                                 <div class="col-md-6">
                                     <input type="text" name="controller_namespace" class="form-control" id="controller_namespace" placeholder="Admin">
                                 </div>
                             </div>
-                            <div class="form-group row">
+                            <div class="form-group row a c v">
                                 <label for="route_group" class="col-md-4 col-form-label text-right">Route Group Prefix:</label>
                                 <div class="col-md-6">
                                     <input type="text" name="route_group" class="form-control" id="route_group" placeholder="admin">
                                 </div>
                             </div>
-                            <div class="form-group row">
+                            <div class="form-group row a c v">
                                 <label for="view_path" class="col-md-4 col-form-label text-right">View Path:</label>
                                 <div class="col-md-6">
                                     <input type="text" name="view_path" class="form-control" id="view_path" placeholder="admin">
                                 </div>
                             </div>
-                            <div class="form-group row">
+                            <div class="form-group row a">
                                 <label for="route" class="col-md-4 col-form-label text-right">Want to add route?</label>
                                 <div class="col-md-6">
                                     <select name="route" class="form-control" id="route">
@@ -46,20 +58,20 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="form-group row">
+                            <div class="form-group row a mo">
                                 <label for="relationships" class="col-md-4 col-form-label text-right">Relationships</label>
                                 <div class="col-md-6">
                                     <input type="text" name="relationships" class="form-control" id="relationships" placeholder="comments#hasMany#App\Comment">
                                     <p class="help-block">method#relationType#Model</p>
                                 </div>
                             </div>
-                            <div class="form-group row">
+                            <div class="form-group row a v">
                                 <label for="form_helper" class="col-md-4 col-form-label text-right">Form Helper</label>
                                 <div class="col-md-6">
                                     <input type="text" name="form_helper" class="form-control" id="form_helper" placeholder="laravelcollective" value="laravelcollective">
                                 </div>
                             </div>
-                            <div class="form-group row">
+                            <div class="form-group row a mo mi">
                                 <label for="soft_deletes" class="col-md-4 col-form-label text-right">Want to use soft deletes?</label>
                                 <div class="col-md-6">
                                     <select name="soft_deletes" class="form-control" id="soft_deletes">
@@ -69,7 +81,7 @@
                                 </div>
                             </div>
                             <hr>
-                            <div class="form-group table-fields">
+                            <div class="form-group table-fields a c mo mi v">
                                 <h4 class="text-center">Table Fields:</h4><br>
                                 <div class="entry col-md-10 offset-md-2 form-inline">
                                     <input class="form-control" name="fields[]" type="text" placeholder="field_name" required="true">
@@ -129,27 +141,5 @@
 @endsection
 
 @section('scripts')
-    <script type="text/javascript">
-        $( document ).ready(function() {
-            $(document).on('click', '.btn-add', function(e) {
-                e.preventDefault();
-
-                var tableFields = $('.table-fields'),
-                    currentEntry = $(this).parents('.entry:first'),
-                    newEntry = $(currentEntry.clone()).appendTo(tableFields);
-
-                newEntry.find('input').val('');
-                tableFields.find('.entry:not(:last) .btn-add')
-                    .removeClass('btn-add').addClass('btn-remove')
-                    .removeClass('btn-success').addClass('btn-danger')
-                    .html('<span class="fa fa-minus"></span>');
-            }).on('click', '.btn-remove', function(e) {
-                $(this).parents('.entry:first').remove();
-
-                e.preventDefault();
-                return false;
-            });
-
-        });
-    </script>
+    {!! $script_master !!}
 @endsection

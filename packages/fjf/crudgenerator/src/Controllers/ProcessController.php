@@ -20,7 +20,8 @@ class ProcessController extends Controller
      */
     public function getGenerator()
     {
-        return view('laravel-admin::generator');
+        $data['script_master'] = $this->footer_script(__FUNCTION__);
+        return view('laravel-admin::generator', $data);
     }
 
     /**
@@ -143,7 +144,9 @@ class ProcessController extends Controller
             return Response::make($e->getMessage(), 500);
         }
 
-        return redirect('admin/generator')->with('flash_message', 'Your CRUD has been generated. See on the menu.');
+        $status = 200;
+        $message = 'Your CRUD has been generated. See on the menu.';
+        return redirect('admin/generator')->with(['flash_status', $status, 'flash_message', $message]);
     }
 
     /**
@@ -197,7 +200,9 @@ class ProcessController extends Controller
             return Response::make($e->getMessage(), 500);
         }
 
-        return redirect('admin/generator')->with('flash_message', 'Your Controller has been generated. See on the menu.');
+        $status = 200;
+        $message = 'Your Controller has been generated. See on the menu.';
+        return redirect('admin/generator')->with(['flash_status', $status, 'flash_message', $message]);
     }
 
     /**
@@ -257,7 +262,9 @@ class ProcessController extends Controller
             return Response::make($e->getMessage(), 500);
         }
 
-        return redirect('admin/generator')->with('flash_message', 'Your Model has been generated.');
+        $status = 200;
+        $message = 'Your Model has been generated.';
+        return redirect('admin/generator')->with(['flash_status', $status, 'flash_message', $message]);
     }
 
     /**
@@ -303,7 +310,9 @@ class ProcessController extends Controller
             return Response::make($e->getMessage(), 500);
         }
 
-        return redirect('admin/generator')->with('flash_message', 'Your Migration has been generated.');
+        $status = 200;
+        $message = 'Your Migration has been generated.';
+        return redirect('admin/generator')->with(['flash_status', $status, 'flash_message', $message]);
     }
 
     /**
@@ -352,6 +361,75 @@ class ProcessController extends Controller
             return Response::make($e->getMessage(), 500);
         }
 
-        return redirect('admin/generator')->with('flash_message', 'Your View has been generated.');
+        $status = 200;
+        $message = 'Your View has been generated.';
+        return redirect('admin/generator')->with(['flash_status', $status, 'flash_message', $message]);
+    }
+
+    /**
+    * @param method $method
+    * @return add main footer script / in spesific method
+    */
+    public function footer_script($method=''){
+        ob_start();
+        switch ($method) {
+            case 'getGenerator':
+                ?>
+                <script type="text/javascript">
+                    function arr(type=''){
+                        switch(type) {
+                            case 'controller':
+                                $('.a').slideUp();
+                                $('.c').show('slow');
+                            break;
+                            case 'model':
+                                $('.a').slideUp();
+                                $('.mo').show('slow');
+                            break;
+                            case 'view':
+                                $('.a').slideUp();
+                                $('.v').show('slow');
+                            break;
+                            case 'migration':
+                                $('.a').slideUp();
+                                $('.mi').show('slow');
+                            break;
+                            default:
+                                $('.a').slideUp();
+                                $('.a').show('slow');
+                        }
+                    }
+                    $( document ).ready(function() {
+                        arr();
+                        $('#choose').on('change', function(){
+                            arr($(this).find(':selected').val());
+                        });
+                        $(document).on('click', '.btn-add', function(e) {
+                            e.preventDefault();
+
+                            var tableFields = $('.table-fields'),
+                                currentEntry = $(this).parents('.entry:first'),
+                                newEntry = $(currentEntry.clone()).appendTo(tableFields);
+
+                            newEntry.find('input').val('');
+                            tableFields.find('.entry:not(:last) .btn-add')
+                                .removeClass('btn-add').addClass('btn-remove')
+                                .removeClass('btn-success').addClass('btn-danger')
+                                .html('<span class="fa fa-minus"></span>');
+                        }).on('click', '.btn-remove', function(e) {
+                            $(this).parents('.entry:first').remove();
+
+                            e.preventDefault();
+                            return false;
+                        });
+
+                    });
+                </script>
+                <?php
+                break;
+        }
+        $script = ob_get_contents();
+        ob_end_clean();
+        return $script;
     }
 }
