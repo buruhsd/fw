@@ -8,11 +8,16 @@ use File;
 use Illuminate\Http\Request;
 use Response;
 use View;
-use Illuminate\Console\Command;
 
 
 class ProcessController extends Controller
 {
+    /** @var string  */
+    protected $routeName = '';
+
+    /** @var string  */
+    protected $controller = '';
+
     /**
      * Display generator.
      *
@@ -157,21 +162,28 @@ class ProcessController extends Controller
     public function postController($request){
         $name = $request->crud_name;
         $modelName = str_singular($name);
+        $crud_arr['--crud-name'] = $name;
+        $crud_arr['--model-name'] = $modelName; 
 
         if ($request->has('controller_namespace')) {
-            $$controllerNamespace = $request->controller_namespace;
+            $controllerNamespace = $request->controller_namespace;
+            $crud_arr['name'] = $controllerNamespace . $name . 'Controller';
         }
 
         if ($request->has('model_namespace')) {
             $modelNamespace = $request->model_namespace;
+            $crud_arr['--model-namespace'] = $modelNamespace; 
         }
 
         if ($request->has('view_path')) {
             $viewPath = $request->view_path;
+            $crud_arr['--view-path'] = $viewPath; 
         }
 
         if ($request->has('route_group')) {
             $routeGroup = $request->route_group;
+            $crud_arr['--route-group'] = $routeGroup; 
+            $this->routeName = ($routeGroup) ? $routeGroup . '/' . snake_case($name, '-') : snake_case($name, '-');
         }
 
         if ($request->has('fields')) {
@@ -186,22 +198,66 @@ class ProcessController extends Controller
                 $x++;
             }
             $fields = implode(";", $fieldsArray);
+            $crud_arr['--fields'] = $fields; 
         }
 
         if (!empty($validationsArray)) {
             $validations = implode("#required;", $validationsArray) . "#required";
+            $crud_arr['--validations'] = $validations;
         }
 
-        $perPage = intval(Command::option('pagination'));
+        if ($request->has('perpage')) {
+            $perpage = $request->perpage;
+            $crud_arr['--pagination'] = $perpage; 
+        }
+
+        $route = 'no';
+        if ($request->has('route')) {
+            $route = $request->route;
+        }
 
         try {
-        Artisan::call('crud:controller', ['name' => $controllerNamespace . $name . 'Controller', '--crud-name' => $name, '--model-name' => $modelName, '--model-namespace' => $modelNamespace, '--view-path' => $viewPath, '--route-group' => $routeGroup, '--pagination' => $perPage, '--fields' => $fields, '--validations' => $validations]);
+            Artisan::call('crud:controller', $crud_arr);
+
+            // Updating the Http/routes.php file
+            $routeFile = app_path('Http/routes.php');
+            if (\App::VERSION() >= '5.3') {
+                $routeFile = base_path('routes/web.php');
+            }
+
+            $status = 200;
+            $message = 'Your Controller has been generated. See on the menu.';
+            
+            if (file_exists($routeFile) && $route == 'yes') {
+                $this->controller = ($controllerNamespace != '') ? $controllerNamespace . '\\' . $name . 'Controller' : $name . 'Controller';
+
+                $isAdded = File::append($routeFile, "\n" . implode("\n", $this->addRoutes()));
+
+                if ($isAdded) {
+                    $message .= 'Crud/Resource route added to ' . $routeFile;
+                } else {
+                    $message .= 'Unable to add the route to ' . $routeFile;
+                }
+            }
+            // Updating Menus
+            $menus = json_decode(File::get(base_path('resources/laravel-admin/menus.json')));
+
+            $routeName = ($crud_arr['--route-group']) ? $crud_arr['--route-group'] . '/' . snake_case($name, '-') : snake_case($name, '-');
+            $menus->menus = array_map(function ($menu) use ($name, $routeName) {
+                if ($menu->section == 'Modules') {
+                    array_push($menu->items, (object) [
+                        'title' => $name,
+                        'url' => '/' . $routeName,
+                    ]);
+                }
+                return $menu;
+            }, $menus->menus);
         } catch (\Exception $e) {
             return Response::make($e->getMessage(), 500);
         }
 
-        $status = 200;
-        $message = 'Your Controller has been generated. See on the menu.';
+        File::put(base_path('resources/laravel-admin/menus.json'), json_encode($menus));
+
         return redirect('admin/generator')->with(['flash_status', $status, 'flash_message', $message]);
     }
 
@@ -214,9 +270,12 @@ class ProcessController extends Controller
         $name = $request->crud_name;
         $modelName = str_singular($name);
         $tableName = str_plural(snake_case($name));
+        $crud_arr['--table'] = $tableName;
 
+        $crud_arr['name'] = $modelName; 
         if ($request->has('model_namespace')) {
             $modelNamespace = $request->model_namespace;
+            $crud_arr['name'] = $modelNamespace . $modelName; 
         }
 
         if ($request->has('fields')) {
@@ -245,19 +304,25 @@ class ProcessController extends Controller
 
         $commaSeparetedString = implode("', '", $fillableArray);
         $fillable = "['" . $commaSeparetedString . "']";
+        $crud_arr['--fillable'] = $fillable;
         
         if ($request->has('relationships')) {
             $relationships = $request->relationships;
+            $crud_arr['--relationships'] = $relationships;
         }
         
         if ($request->has('soft_deletes')) {
             $softDeletes = $request->soft_deletes;
+            $crud_arr['--soft-deletes'] = $softDeletes;
         }
 
-        $primaryKey = Command::option('pk');
+        if ($request->has('pk')) {
+            $pk = $request->pk;
+            $crud_arr['--pk'] = $pk; 
+        }
         
         try {
-        Artisan::call('crud:model', ['name' => $modelNamespace . $modelName, '--fillable' => $fillable, '--table' => $tableName, '--pk' => $primaryKey, '--relationships' => $relationships, '--soft-deletes' => $softDeletes]);
+        Artisan::call('crud:model', $crud_arr);
         } catch (\Exception $e) {
             return Response::make($e->getMessage(), 500);
         }
@@ -275,6 +340,7 @@ class ProcessController extends Controller
     public function postMigration($request){
         $name = $request->crud_name;
         $migrationName = str_plural(snake_case($name));
+        $crud_arr['name'] = $migrationName;
 
         if ($request->has('fields')) {
             $fieldsArray = [];
@@ -295,17 +361,30 @@ class ProcessController extends Controller
             $migrationFields .= '#' . $modifier;
             $migrationFields .= ';';
         }
+        $crud_arr['--schema'] = $migrationFields;
 
-        $primaryKey = Command::option('pk');
-        $indexes = Command::option('indexes');
-        $foreignKeys = Command::option('foreign-keys');
+        if ($request->has('pk')) {
+            $pk = $request->pk;
+            $crud_arr['--pk'] = $pk; 
+        }
+
+        if ($request->has('indexes')) {
+            $indexes = $request->indexes;
+            $crud_arr['--indexes'] = $indexes; 
+        }
+
+        if ($request->has('foreignKeys')) {
+            $foreignKeys = $request->foreignKeys;
+            $crud_arr['--foreign-keys'] = $foreignKeys; 
+        }
 
         if ($request->has('soft_deletes')) {
             $softDeletes = $request->soft_deletes;
+            $crud_arr['--soft-deletes'] = $softDeletes;
         }
 
         try {
-        Artisan::call('crud:migration', ['name' => $migrationName, '--schema' => $migrationFields, '--pk' => $primaryKey, '--indexes' => $indexes, '--foreign-keys' => $foreignKeys, '--soft-deletes' => $softDeletes]);
+        Artisan::call('crud:migration', $crud_arr);
         } catch (\Exception $e) {
             return Response::make($e->getMessage(), 500);
         }
@@ -322,6 +401,7 @@ class ProcessController extends Controller
     */
     public function postView($request){
         $name = $request->crud_name;
+        $crud_arr['name'] = $name;
 
         if ($request->has('fields')) {
             $fieldsArray = [];
@@ -336,27 +416,40 @@ class ProcessController extends Controller
             }
             $fields = implode(";", $fieldsArray);
         }
+        $crud_arr['--fields'] = $fields;
 
         if (!empty($validationsArray)) {
             $validations = implode("#required;", $validationsArray) . "#required";
+            $crud_arr['--validations'] = $validations;
         }
 
         if ($request->has('view_path')) {
             $viewPath = $request->view_path;
+            $crud_arr['--view-path'] = $viewPath;
         }
 
         if ($request->has('route_group')) {
             $routeGroup = $request->route_group;
+            $crud_arr['--route-group'] = $routeGroup;
         }
 
-        $localize = $this->option('localize');
-        $primaryKey = Command::option('pk');
+        if ($request->has('localize')) {
+            $localize = $request->localize;
+            $crud_arr['--localize'] = $localize;
+        }
+
+        if ($request->has('pk')) {
+            $pk = $request->pk;
+            $crud_arr['--pk'] = $pk; 
+        }
+
         if ($request->has('form_helper')) {
-            $commandArg['--form-helper'] = $request->form_helper;
+            $formHelper = $request->form_helper;
+            $crud_arr['--form-helper'] = $formHelper;
         }
 
         try {
-        Artisan::call('crud:view', ['name' => $name, '--fields' => $fields, '--validations' => $validations, '--view-path' => $viewPath, '--route-group' => $routeGroup, '--localize' => $localize, '--pk' => $primaryKey, '--form-helper' => $formHelper]);
+        Artisan::call('crud:view', $crud_arr);
         } catch (\Exception $e) {
             return Response::make($e->getMessage(), 500);
         }
@@ -364,6 +457,16 @@ class ProcessController extends Controller
         $status = 200;
         $message = 'Your View has been generated.';
         return redirect('admin/generator')->with(['flash_status', $status, 'flash_message', $message]);
+    }
+
+    /**
+     * Add routes.
+     *
+     * @return  array
+     */
+    protected function addRoutes()
+    {
+        return ["Route::resource('" . $this->routeName . "', '" . $this->controller . "');"];
     }
 
     /**

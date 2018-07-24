@@ -49,7 +49,7 @@
                                     <input type="text" name="view_path" class="form-control" id="view_path" placeholder="admin">
                                 </div>
                             </div>
-                            <div class="form-group row a">
+                            <div class="form-group row a c">
                                 <label for="route" class="col-md-4 col-form-label text-right">Want to add route?</label>
                                 <div class="col-md-6">
                                     <select name="route" class="form-control" id="route">

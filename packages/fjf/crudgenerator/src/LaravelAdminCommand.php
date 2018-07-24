@@ -13,14 +13,14 @@ class LaravelAdminCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'laravel-admin:install';
+    protected $signature = 'fjf-crud:install';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Installing Laravel Admin Crud.';
+    protected $description = 'Installing Fjf Admin Crud.';
 
     /**
      * Create a new command instance.
@@ -86,18 +86,24 @@ EOD;
         $this->info("Updating Model User usable");
         $this->replaseUser($userFile, $repUser);
 
+        $kernelFile = app_path('Http\Kernel.php');
+        $repKernel ='protected $routeMiddleware = ['.PHP_EOL."\t\t".'\'roles\' => \App\Http\Middleware\CheckRole::class,';
+        
+        $this->info("Updating Kernel");
+        $this->replaseKernel($kernelFile, $repKernel);
+
         $this->info("Overriding the AuthServiceProvider");
         $contents = File::get(__DIR__ . '/../publish/Providers/AuthServiceProvider.php');
         File::put(app_path('Providers/AuthServiceProvider.php'), $contents);
 
-        $this->info("Successfully installed Laravel Admin!!!");
+        $this->info("Successfully installed Fjf Admin Crud!!!");
     }
 
     /**
-     * Replace the crudName for the given stub.
+     * Replace the replace for the given stub.
      *
      * @param  string  $stub
-     * @param  string  $crudName
+     * @param  string  $replace
      *
      * @return $this
      */
@@ -106,6 +112,25 @@ EOD;
         $fhandle = fopen($stub,"r");
         $content = fread($fhandle,filesize($stub));
         $content = str_replace("use Notifiable;", $replace, $content);
+
+        $fhandle = fopen($stub,"w");
+        fwrite($fhandle,$content);
+        fclose($fhandle);
+    }
+
+    /**
+     * Replace the replace for the given stub.
+     *
+     * @param  string  $stub
+     * @param  string  $replace
+     *
+     * @return $this
+     */
+    protected function replaceKernel(&$stub, $replace)
+    {
+        $fhandle = fopen($stub,"r");
+        $content = fread($fhandle,filesize($stub));
+        $content = str_replace('protected $routeMiddleware = [', $replace, $content);
 
         $fhandle = fopen($stub,"w");
         fwrite($fhandle,$content);
