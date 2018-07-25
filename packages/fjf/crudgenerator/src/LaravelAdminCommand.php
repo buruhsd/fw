@@ -84,13 +84,13 @@ EOD;
         $repUser = 'use Notifiable, HasRoles;';
         
         $this->info("Updating Model User usable");
-        $this->replaseUser($userFile, $repUser);
+        $this->replaceUser($userFile, $repUser);
 
         $kernelFile = app_path('Http\Kernel.php');
         $repKernel ='protected $routeMiddleware = ['.PHP_EOL."\t\t".'\'roles\' => \App\Http\Middleware\CheckRole::class,';
         
         $this->info("Updating Kernel");
-        $this->replaseKernel($kernelFile, $repKernel);
+        $this->replaceKernel($kernelFile, $repKernel);
 
         $this->info("Overriding the AuthServiceProvider");
         $contents = File::get(__DIR__ . '/../publish/Providers/AuthServiceProvider.php');
@@ -107,7 +107,7 @@ EOD;
      *
      * @return $this
      */
-    protected function replaseUser(&$stub, $replace)
+    protected function replaceUser(&$stub, $replace)
     {
         $fhandle = fopen($stub,"r");
         $content = fread($fhandle,filesize($stub));

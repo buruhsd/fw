@@ -227,7 +227,7 @@ class ProcessController extends Controller
 
             $status = 200;
             $message = 'Your Controller has been generated. See on the menu.';
-            
+
             if (file_exists($routeFile) && $route == 'yes') {
                 $this->controller = ($controllerNamespace != '') ? $controllerNamespace . '\\' . $name . 'Controller' : $name . 'Controller';
 
