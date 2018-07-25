@@ -11,6 +11,9 @@
 
 Step Installation
 - Clone this project.
+- Create your database.
+- Rename .env.example to .env and open them.
+- setup your db config on .env file.
 - delete composer.json.
 - open composeer in your project.
 - enter <pre>composer install</pre>.
