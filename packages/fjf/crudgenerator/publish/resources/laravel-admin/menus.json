@@ -1,1 +1,8 @@
-{"menus":[{"section":"User Manager","items":[{"title":"Users","url":"\/admin\/users"},{"title":"Roles","url":"\/admin\/roles"},{"title":"Permissions","url":"\/admin\/permissions"}]},{"section":"Tools","items":[{"title":"Generator","url":"\/admin\/generator"}]},{"section":"Modules","items":[]}]}
+{"menus":[{
+	"section":"USER MANAGER",
+	"items":[{"title":"Users","url":"\/admin\/users"},
+			{"title":"Roles","url":"\/admin\/roles"},
+			{"title":"Permissions","url":"\/admin\/permissions"}]},
+	{"section":
+		"TOOLS","items":[{"title":"Generator","url":"\/admin\/generator"}]},
+	{"section":"Modules","items":[]}]}
