@@ -136,7 +136,7 @@ class DummyClass extends Controller
     public function destroy($id)
     {
         $status = 200;
-        $message = '{{modelName}} added!';
+        $message = '{{modelName}} deleted!';
         $res = {{modelName}}::destroy($id);
         if(!$res){
             $status = 500;

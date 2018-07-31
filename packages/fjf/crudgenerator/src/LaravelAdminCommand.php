@@ -92,6 +92,12 @@ EOD;
         $this->info("Updating Kernel");
         $this->replaceKernel($kernelFile, $repKernel);
 
+        $providerFile = app_path('Http\\Providers\\AppServiceProvider.php');
+        $repProvider ='public function boot()'.PHP_EOL."\t".'{'.PHP_EOL."\t\t".'Schema::defaultStringLength(191);';
+        
+        $this->info("Updating AppProvider");
+        $this->replaceProvider($providerFile, $repProvider);
+
         $this->info("Overriding the AuthServiceProvider");
         $contents = File::get(__DIR__ . '/../publish/Providers/AuthServiceProvider.php');
         File::put(app_path('Providers/AuthServiceProvider.php'), $contents);
@@ -131,6 +137,25 @@ EOD;
         $fhandle = fopen($stub,"r");
         $content = fread($fhandle,filesize($stub));
         $content = str_replace('protected $routeMiddleware = [', $replace, $content);
+
+        $fhandle = fopen($stub,"w");
+        fwrite($fhandle,$content);
+        fclose($fhandle);
+    }
+
+    /**
+     * Replace the replace for the given stub.
+     *
+     * @param  string  $stub
+     * @param  string  $replace
+     *
+     * @return $this
+     */
+    protected function replaceProvider(&$stub, $replace)
+    {
+        $fhandle = fopen($stub,"r");
+        $content = fread($fhandle,filesize($stub));
+        $content = str_replace('public function boot()'.PHP_EOL."\t".'{', $replace, $content);
 
         $fhandle = fopen($stub,"w");
         fwrite($fhandle,$content);
