@@ -1,0 +1,66 @@
+<?php
+
+namespace DummyNamespace;
+
+use Illuminate\Database\Eloquent\Model;
+{{useSoftDeletes}}
+class DummyClass extends Model
+{
+    {{softDeletes}}/**
+     * The database table used by the model.
+     *
+     * @var string
+     */
+    protected $table = '{{table}}';
+
+    {{primaryKey}}
+
+    /**
+     * Attributes that should be mass-assignable.
+     *
+     * @var array
+     */
+    protected $fillable = {{fillable}};
+
+    {{relationships}}
+
+    /**
+    * this is for get parent example
+    * @relation one to many with parent
+    */
+    // public function tables() {
+    //     return $this->belongsTo('App\modelname', 'table_id');
+    // }
+
+    /**
+    * this is for get child example
+    * @relation one many with children
+    */
+    // public function tables() {
+    //     return $this->hasMany('App\modelname')->orderBy('id', 'ASC');
+    // }
+
+    /**
+    * this is for get child example
+    * @relation with children
+    */
+    // public function tables() {
+    //     return $this->hasOne('App\modelname')->orderBy('id', 'ASC');
+    // }
+
+    /**
+    * this is for get child example
+    * @relation many to many with children
+    */
+    // public function tables() {
+    //     return $this->belongsToMany('App\modelname')->orderBy('id', 'ASC');
+    // }
+
+    /**
+    * this is for get child example
+    * @relation has many children and have many children
+    */
+    // public function tables() {
+    //     return $this->hasManyThrough('App\modelname', 'App\modelname');
+    // }
+}
