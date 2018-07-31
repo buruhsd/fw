@@ -15,6 +15,20 @@ Step Installation
 - Rename .env.example to .env and open them.
 - setup your db config on .env file.
 - delete composer.json.
+- open app/Provider\AppServiceProvider.php and replace
+	<pre>
+    public function boot()
+    {
+    	//
+    }
+	</pre>
+- to
+	<pre>
+    public function boot()
+    {
+		<pre>Schema::defaultStringLength(191);</pre>
+    }
+	</pre>
 - open composeer in your project.
 - enter <pre>composer install</pre>.
 - enter <pre>php artisan fjf-crud:install</pre>.

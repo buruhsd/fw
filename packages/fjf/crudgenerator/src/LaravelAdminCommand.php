@@ -92,11 +92,11 @@ EOD;
         $this->info("Updating Kernel");
         $this->replaceKernel($kernelFile, $repKernel);
 
-        $providerFile = app_path('Http\\Providers\\AppServiceProvider.php');
-        $repProvider ='public function boot()'.PHP_EOL."\t".'{'.PHP_EOL."\t\t".'Schema::defaultStringLength(191);';
+        // $providerFile = app_path('Providers\\AppServiceProvider.php');
+        // $repProvider ='public function boot()'.PHP_EOL."\t".'{'.PHP_EOL."\t\t".'Schema::defaultStringLength(191);';
         
-        $this->info("Updating AppProvider");
-        $this->replaceProvider($providerFile, $repProvider);
+        // $this->info("Updating AppProvider");
+        // $this->replaceProvider($providerFile, $repProvider);
 
         $this->info("Overriding the AuthServiceProvider");
         $contents = File::get(__DIR__ . '/../publish/Providers/AuthServiceProvider.php');
