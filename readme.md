@@ -26,7 +26,7 @@ Step Installation
 	<pre>
     public function boot()
     {
-		<pre>Schema::defaultStringLength(191);</pre>
+		Schema::defaultStringLength(191);
     }
 	</pre>
 - open composeer in your project.
