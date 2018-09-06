@@ -42,6 +42,10 @@ class LaravelAdminServiceProvider extends ServiceProvider
         ]);
 
         $this->publishes([
+            __DIR__ . '/../publish/public/' => base_path('public'),
+        ]);
+
+        $this->publishes([
             __DIR__ . '/../publish/crudgenerator.php' => config_path('crudgenerator.php'),
         ]);
 
